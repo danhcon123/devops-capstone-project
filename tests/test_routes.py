@@ -166,3 +166,23 @@ class TestAccountService(TestCase):
             f"Expected 404 when reading non-existant account, got {get_response.status_code} instead" 
             )
         
+    def test_to_list_out_accounts(self):
+        """It should Get a list of Accounts"""
+        self._create_accounts(5)
+        # send a self.client.get() request to the BASE_URL
+        response=self.client.get(BASE_URL)
+        
+        # assert that the resp.status_code is status.HTTP_200_OK
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+            f"Expect to get status 200, but got {response.status_code} instead."
+        )
+        # get the data from resp.get_json()
+        get_accounts = response.get_json()
+        # assert that the len() of the data is 5 (the number of accounts you created)
+        self.assertEqual(
+            len(get_accounts),
+            5,
+            f"Expect to get 5 accounts back, but got {len(get_accounts)} instead.")
+        
