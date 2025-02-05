@@ -124,3 +124,45 @@ class TestAccountService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     # ADD YOUR TEST CASES HERE ...
+    def test_read_an_account(self):
+        """It should Read a single Account"""
+        account = self._create_accounts(1)[0]
+        post_response=self.client.post(
+            BASE_URL,
+            json=account.serialize(),
+            content_type="application/json"
+        )
+        self.assertEqual(
+            post_response.status_code,
+            status.HTTP_201_CREATED,
+            "Account_creation_failed"
+        )
+        #Extract the account id from the creation response
+        new_account = post_response.get_json()
+        account_id = new_account["id"]
+
+        #Read the account using the account id
+        get_response = self.client.get(f"{BASE_URL}/{account_id}")
+        self.assertEqual(
+            get_response.status_code,
+            status.HTTP_200_OK,
+            "Reading the account did not return HTTP_200_OK "
+        )
+
+        # Verify that the returned data matches what was sent
+        retrieved_account = get_response.get_json()
+        self.assertEqual(retrieved_account["name"], account.name)
+        self.assertEqual(retrieved_account["email"], account.email)
+        self.assertEqual(retrieved_account["address"], account.address)
+        self.assertEqual(retrieved_account["phone_number"], account.phone_number)
+        self.assertEqual(retrieved_account["date_joined"], str(account.date_joined))
+
+    def test_account_not_found(self):
+        """It should not Read an Account that is not found"""
+        get_response=self.client.get(f"{BASE_URL}/0")
+        self.assertEqual(
+            get_response.status_code, 
+            status.HTTP_404_NOT_FOUND, 
+            f"Expected 404 when reading non-existant account, got {get_response.status_code} instead" 
+            )
+        
