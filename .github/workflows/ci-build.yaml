@@ -1,0 +1,27 @@
+name: CI Build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-lastest  # Runs the job on the lastest Ubuntu runner
+    container: python:3.9-slim  # Uses the Python 3.9 slim image
+    
+    services:
+      postgres:
+        image:  postgres:alpine # Defines Postgres service using Alpine image 
+        ports:
+          - 5432:5432  # Listen on the default Postgres port
+        env:
+          POSTGRES_PASSWORD: pgs3cr3t  # Sets the Postgres password
+          POSTGRES_DB: testdb  # Create a database named 'testdb'
+        options: >-  #Configures health checks
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
