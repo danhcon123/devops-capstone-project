@@ -229,3 +229,36 @@ class TestAccountService(TestCase):
             "Thuy Anh",
             "Name of the Account hasn't been updated."
         )
+
+    def test_delete_account(self):
+        """It should Delete an Account"""
+        account = self._create_accounts(1)[0]
+        response = self.client.post(
+            BASE_URL,
+            json=account.serialize(),
+            content_type="application/json"
+        )
+        self.assertEqual(
+            response.status_code, 
+            status.HTTP_201_CREATED, 
+            f"Expect to get HTTP_201_CREATED, but got {response.status_code} instead."
+        )
+        new_account = response.get_json()
+        #Extract the account id from the creation response
+        account_id = new_account["id"]
+
+        #Read the account using the account id
+        get_response = self.client.delete(
+            f"{BASE_URL}/{account_id}"
+            )
+        self.assertEqual(
+            get_response.status_code,
+            status.HTTP_204_NO_CONTENT,
+            f"Delete the account did not return HTTP_204_NO_CONTENT. Instead {get_response.status_code} "
+        )
+        followup_response = self.client.get(f"{BASE_URL}/{account_id}")
+        self.assertEqual(
+            followup_response.status_code,
+            status.HTTP_404_NOT_FOUND,
+            f"Expected 404 when trying to read a deleted account, but got {followup_response.status_code}"
+        )

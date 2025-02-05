@@ -109,10 +109,12 @@ def updated_account(account_id):
     if not account:
         app.logger.info("Account with id [%s] not found.", account_id)  # Ensure logging works
         abort(status.HTTP_404_NOT_FOUND, f"Account with id [{account_id}] could not be found.")  # Ensure abort is triggered
-        # call the deserialize() method on the account passing in request.get_json()
+    # call the deserialize() method on the account passing in request.get_json()
     account = account.deserialize(request.get_json())
     # call account.update() to update the account with the new data
     account.update()
+    app.logger.info(f"Account with id {account_id} has been updated.")
+
     return account.serialize(), status.HTTP_200_OK
 
 
@@ -121,6 +123,25 @@ def updated_account(account_id):
 ######################################################################
 
 # ... place you code here to DELETE an account ...
+@app.route("/accounts/<int:account_id>", methods=["DELETE"])
+def delete_accounts(account_id):
+    """
+    Delete an Account
+    This endpoint will delete an Account based on the account_id that is requested
+    """
+    app.logger.info("Request to delete an Account with id: ", account_id)
+    # use the Account.find() method to retrieve the account by the account_id
+    account = Account.find(account_id)
+    # abort() with a status.HTTP_404_NOT_FOUND if it cannot be found
+    if not account:
+        app.logger.info("Account with id [%s] not found.", account_id)  # Ensure logging works
+        abort(status.HTTP_404_NOT_FOUND, f"Account with id [{account_id}] could not be found.")  # Ensure abort is triggered
+    # if found, call the delete() method on the account
+    account.delete()
+    app.logger.info(f"Account with id {account_id} has been deleted.")
+
+    # return and empty body ("") with a return code of status.HTTP_204_NO_CONTENT
+    return "", status.HTTP_204_NO_CONTENT
 
 
 ######################################################################
