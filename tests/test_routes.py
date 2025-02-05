@@ -165,7 +165,8 @@ class TestAccountService(TestCase):
             status.HTTP_404_NOT_FOUND, 
             f"Expected 404 when reading non-existant account, got {get_response.status_code} instead" 
             )
-        
+    
+    # test out the list of the accounts    
     def test_to_list_out_accounts(self):
         """It should Get a list of Accounts"""
         self._create_accounts(5)
@@ -186,3 +187,45 @@ class TestAccountService(TestCase):
             5,
             f"Expect to get 5 accounts back, but got {len(get_accounts)} instead.")
         
+
+    # test the update method for accounts
+    def test_update_account(self):
+        """It should Update an existing Account"""
+        # create an Account to update
+        test_account = AccountFactory()
+        response = self.client.post(
+            BASE_URL,
+            json=test_account.serialize(),
+            content_type="application/json"
+        )
+        self.assertEqual(
+            response.status_code, 
+            status.HTTP_201_CREATED, 
+            f"Expect to get HTTP_201_CREATED, but got {response.status_code} instead."
+        )
+
+        # update the account
+        new_account = response.get_json()
+        new_account_id = new_account["id"]
+        new_account["name"] = "Thuy Anh"
+        
+        new_response = self.client.put(
+            f"{BASE_URL}/{new_account_id}",  # URL for personal account
+            json=new_account,
+            content_type="application/json"
+        )
+        
+        self.assertEqual(
+            new_response.status_code,
+            status.HTTP_200_OK,
+            f"Expected HTTP_200_OK but got {new_response.status_code} instead."
+        )
+        
+        # verify that name was updated
+        updated_account = new_response.get_json()
+        self.assertIn("name", updated_account, "Response JSON does not contain 'name' field")
+        self.assertEqual(
+            updated_account["name"], 
+            "Thuy Anh",
+            "Name of the Account hasn't been updated."
+        )
