@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-lastest  # Runs the job on the lastest Ubuntu runner
+    runs-on: ubuntu-latest  # Runs the job on the latest Ubuntu runner
     container: python:3.9-slim  # Uses the Python 3.9 slim image
     
     services:
