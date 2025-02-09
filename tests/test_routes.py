@@ -14,6 +14,7 @@ from service.models import db, Account, init_db
 from service.routes import app
 from service import talisman
 
+
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
 )
@@ -282,10 +283,15 @@ class TestAccountService(TestCase):
         # Extract headers from the response
         headers = response.headers
 
-        #Assert the presence of security headers
+        # Assert the presence of security headers
         assert headers.get("X-Frame-Options") == "SAMEORIGIN"
         assert headers.get("X-Content-Type-Options") == "nosniff"
         assert headers.get("Content-Security-Policy") == "default-src 'self'; object-src 'none'"
         assert headers.get("Referrer-Policy") == "strict-origin-when-cross-origin"
 
-        print("✅ Security headers test passed!")
+    def test_cors_security(self):
+        """It should return a CORS header"""
+        response = self.client.get('/', environ_overrides=HTTPS_ENVIRON)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, f"Expected 200 OK, got {response.status_code}")
+        # Check for the CORS header
+        self.assertEqual(response.headers.get('Access-Control-Allow-Origin'), '*', "got {response.headers.get('Access-Control-Allow-Origin')")
