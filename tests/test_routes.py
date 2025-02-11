@@ -26,6 +26,8 @@ HTTPS_ENVIRON = {'wsgi.url_scheme': 'https'}
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+
+
 class TestAccountService(TestCase):
     """Account Service Tests"""
 
@@ -125,13 +127,16 @@ class TestAccountService(TestCase):
             json=account.serialize(),
             content_type="test/html"
         )
-        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+        )
 
     # ADD YOUR TEST CASES HERE ...
     def test_read_an_account(self):
         """It should Read a single Account"""
         account = self._create_accounts(1)[0]
-        post_response=self.client.post(
+        post_response = self.client.post(
             BASE_URL,
             json=account.serialize(),
             content_type="application/json"
@@ -141,11 +146,11 @@ class TestAccountService(TestCase):
             status.HTTP_201_CREATED,
             "Account_creation_failed"
         )
-        #Extract the account id from the creation response
+        # Extract the account id from the creation response
         new_account = post_response.get_json()
         account_id = new_account["id"]
 
-        #Read the account using the account id
+        # Read the account using the account id
         get_response = self.client.get(f"{BASE_URL}/{account_id}")
         self.assertEqual(
             get_response.status_code,
@@ -158,44 +163,48 @@ class TestAccountService(TestCase):
         self.assertEqual(retrieved_account["name"], account.name)
         self.assertEqual(retrieved_account["email"], account.email)
         self.assertEqual(retrieved_account["address"], account.address)
-        self.assertEqual(retrieved_account["phone_number"], account.phone_number)
-        self.assertEqual(retrieved_account["date_joined"], str(account.date_joined))
+        self.assertEqual(
+            retrieved_account["phone_number"],
+            account.phone_number
+        )
+        self.assertEqual(
+            retrieved_account["date_joined"],
+            str(account.date_joined)
+        )
 
     def test_account_not_found(self):
         """It should not Read an Account that is not found"""
-        get_response=self.client.get(f"{BASE_URL}/0")
+        get_response = self.client.get(f"{BASE_URL}/0")
         self.assertEqual(
-            get_response.status_code, 
-            status.HTTP_404_NOT_FOUND, 
-            f"Expected 404 when reading non-existant account, got {get_response.status_code} instead" 
-            )
-    
-    # test out the list of the accounts    
+            get_response.status_code,
+            status.HTTP_404_NOT_FOUND,
+            f"Expected 404,got {get_response.status_code} instead"
+        )
+
+    # Test out the list of the accounts
     def test_to_list_out_accounts(self):
         """It should Get a list of Accounts"""
         self._create_accounts(5)
-        # send a self.client.get() request to the BASE_URL
-        response=self.client.get(BASE_URL)
-        
-        # assert that the resp.status_code is status.HTTP_200_OK
+        # Send a self.client.get() request to the BASE_URL
+        response = self.client.get(BASE_URL)
+        # Assert that the resp.status_code is status.HTTP_200_OK
         self.assertEqual(
             response.status_code,
             status.HTTP_200_OK,
-            f"Expect to get status 200, but got {response.status_code} instead."
+            f"Expect 200, but got {response.status_code} instead."
         )
-        # get the data from resp.get_json()
+        # Get the data from resp.get_json()
         get_accounts = response.get_json()
-        # assert that the len() of the data is 5 (the number of accounts you created)
+        # Assert that the len() of the data is 5
         self.assertEqual(
             len(get_accounts),
             5,
-            f"Expect to get 5 accounts back, but got {len(get_accounts)} instead.")
-        
+            f"Expect 5, but got {len(get_accounts)} instead.")
 
-    # test the update method for accounts
+    # Test the update method for accounts
     def test_update_account(self):
         """It should Update an existing Account"""
-        # create an Account to update
+        # Create an Account to update
         test_account = AccountFactory()
         response = self.client.post(
             BASE_URL,
@@ -203,33 +212,32 @@ class TestAccountService(TestCase):
             content_type="application/json"
         )
         self.assertEqual(
-            response.status_code, 
-            status.HTTP_201_CREATED, 
-            f"Expect to get HTTP_201_CREATED, but got {response.status_code} instead."
+            response.status_code,
+            status.HTTP_201_CREATED,
+            f"Expect 201, but got {response.status_code} instead."
         )
-
-        # update the account
+        # Update the account
         new_account = response.get_json()
         new_account_id = new_account["id"]
         new_account["name"] = "Thuy Anh"
-        
         new_response = self.client.put(
             f"{BASE_URL}/{new_account_id}",  # URL for personal account
             json=new_account,
             content_type="application/json"
         )
-        
         self.assertEqual(
             new_response.status_code,
             status.HTTP_200_OK,
             f"Expected HTTP_200_OK but got {new_response.status_code} instead."
         )
-        
-        # verify that name was updated
+        # Verify that name was updated
         updated_account = new_response.get_json()
-        self.assertIn("name", updated_account, "Response JSON does not contain 'name' field")
+        self.assertIn(
+            "name",
+            updated_account,
+            "Response JSON does not contain 'name' field")
         self.assertEqual(
-            updated_account["name"], 
+            updated_account["name"],
             "Thuy Anh",
             "Name of the Account hasn't been updated."
         )
@@ -243,28 +251,27 @@ class TestAccountService(TestCase):
             content_type="application/json"
         )
         self.assertEqual(
-            response.status_code, 
-            status.HTTP_201_CREATED, 
-            f"Expect to get HTTP_201_CREATED, but got {response.status_code} instead."
+            response.status_code,
+            status.HTTP_201_CREATED,
+            f"Expect 201, but got {response.status_code} instead."
         )
         new_account = response.get_json()
-        #Extract the account id from the creation response
+        # Extract the account id from the creation response
         account_id = new_account["id"]
-
-        #Read the account using the account id
+        # Read the account using the account id
         get_response = self.client.delete(
             f"{BASE_URL}/{account_id}"
             )
         self.assertEqual(
             get_response.status_code,
             status.HTTP_204_NO_CONTENT,
-            f"Delete the account did not return HTTP_204_NO_CONTENT. Instead {get_response.status_code} "
+            f"Expect 204. Instead {get_response.status_code}."
         )
         followup_response = self.client.get(f"{BASE_URL}/{account_id}")
         self.assertEqual(
             followup_response.status_code,
             status.HTTP_404_NOT_FOUND,
-            f"Expected 404 when trying to read a deleted account, but got {followup_response.status_code}"
+            f"Expected 404, but got {followup_response.status_code}."
         )
 
     def test_method_not_allowed(self):
@@ -276,22 +283,34 @@ class TestAccountService(TestCase):
         """It should return security headers"""
         # Create a test client
         client = app.test_client()
-
         # Make a request to the root URL with HTTPS enforced
-        response = client.get("/", environ_overrides = HTTPS_ENVIRON)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, "Response problematic from server.")
+        response = client.get("/", environ_overrides=HTTPS_ENVIRON)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+            "Response problematic from server."
+        )
         # Extract headers from the response
         headers = response.headers
-
         # Assert the presence of security headers
         assert headers.get("X-Frame-Options") == "SAMEORIGIN"
         assert headers.get("X-Content-Type-Options") == "nosniff"
-        assert headers.get("Content-Security-Policy") == "default-src 'self'; object-src 'none'"
-        assert headers.get("Referrer-Policy") == "strict-origin-when-cross-origin"
+        csp = headers.get("Content-Security-Policy")
+        assert csp == "default-src 'self'; object-src 'none'"
+        rp = headers.get("Referrer-Policy")
+        assert rp == "strict-origin-when-cross-origin"
 
     def test_cors_security(self):
         """It should return a CORS header"""
         response = self.client.get('/', environ_overrides=HTTPS_ENVIRON)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, f"Expected 200 OK, got {response.status_code}")
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+            f"Expected 200 OK, got {response.status_code}"
+        )
         # Check for the CORS header
-        self.assertEqual(response.headers.get('Access-Control-Allow-Origin'), '*', "got {response.headers.get('Access-Control-Allow-Origin')")
+        self.assertEqual(
+            response.headers.get('Access-Control-Allow-Origin'),
+            '*',
+            "got {response.headers.get('Access-Control-Allow-Origin')"
+        )
