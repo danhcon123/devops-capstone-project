@@ -58,9 +58,11 @@ spec:
       taskRef:
         name: nose
       params:
+      - name: message
+        value: "Running nosetests"
       - name: database_uri
         value: "sqlite:///test.db"
       - name: args
-        value: "-v --with-spec --spec-colorv
+        value: "-v --with-spec --spec-color"
       runAfter:
         - clone
