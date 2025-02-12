@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  creationTimestamp: "2025-02-10T19:21:19Z"
+  # creationTimestamp: "2025-02-10T19:21:19Z"
   labels:
     app: accounts
   name: accounts-deployment
   namespace: sn-labs-gauvatich123
-  resourceVersion: "2007165928"
-  uid: 89431d56-4bdf-4cd3-9dcf-ba478db5aef3
+  # resourceVersion: "2007165928"
+  # uid: 89431d56-4bdf-4cd3-9dcf-ba478db5aef3
 spec:
   clusterIP: 172.21.149.38
   clusterIPs:

@@ -83,7 +83,11 @@ spec:
         pip install -qr requirements.txt
         nosetests -v --with-spec --spec-color
 
+<<<<<<< HEAD
+        echo "***** Running nosetest with: $(params.args)*****"
+=======
         echo "***** Running nosetests with: $(params.args)*****"
+>>>>>>> main
         nosetests $(params.args)
 
 
