@@ -84,6 +84,6 @@ spec:
         nosetests -v --with-spec --spec-color
 
         echo "***** Running nosetest with: $(params.args)*****"
-        nosetests" $(params.args)
+        nosetests $(params.args)
 
 
